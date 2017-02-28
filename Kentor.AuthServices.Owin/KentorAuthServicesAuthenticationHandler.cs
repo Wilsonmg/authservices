@@ -98,7 +98,7 @@ namespace Kentor.AuthServices.Owin
             if (revoke != null)
             {
                 var request = await Context.ToHttpRequestData(Options.DataProtector.Unprotect);
-                var urls = new AuthServicesUrls(request, Options);
+                var urls = new AuthServicesUrls(request, Options.SPOptions);
 
                 string redirectUrl = revoke.Properties.RedirectUri;
                 if (string.IsNullOrEmpty(redirectUrl))

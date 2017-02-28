@@ -83,6 +83,11 @@ namespace Kentor.AuthServices.Saml2P
         public EntityId Issuer { get; set; }
 
         /// <summary>
+        /// The additional content to append within an Extensions element.
+        /// </summary>
+        public IEnumerable<XNode> ExtensionsContent { get; set; }
+
+        /// <summary>
         /// The SAML2 request name
         /// </summary>
         protected abstract string LocalName { get; }
@@ -108,6 +113,11 @@ namespace Kentor.AuthServices.Saml2P
             if (Issuer != null && !string.IsNullOrEmpty(Issuer.Id))
             {
                 yield return new XElement(Saml2Namespaces.Saml2 + "Issuer", Issuer.Id);
+            }
+
+            if (ExtensionsContent != null)
+            {
+                yield return new XElement(Saml2Namespaces.Saml2P + "Extensions", ExtensionsContent);
             }
         }
 
@@ -135,6 +145,13 @@ namespace Kentor.AuthServices.Saml2P
             if(issuerNode != null)
             {
                 Issuer = new EntityId(issuerNode.InnerXml);
+            }
+
+            var extensionsNode = xml["Extensions", Saml2Namespaces.Saml2PName];
+            if (extensionsNode != null && extensionsNode.HasChildNodes)
+            {
+                var converted = XElement.Parse(extensionsNode.OuterXml);
+                ExtensionsContent = converted.Elements().ToList();
             }
         }
 
@@ -168,11 +185,5 @@ namespace Kentor.AuthServices.Saml2P
         /// to the signature processing rules of each binding.
         /// </summary>
         public X509Certificate2 SigningCertificate { get; set; }
-        /// <summary>
-        /// The signing algorithm to use when signing the message during binding, 
-        /// according to the signature processing rules of each binding.
-        /// </summary>
-        /// <value>The signing algorithm.</value>
-        public string SigningAlgorithm { get; set; }
     }
 }

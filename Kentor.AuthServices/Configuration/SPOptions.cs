@@ -28,7 +28,6 @@ namespace Kentor.AuthServices.Configuration
             systemIdentityModelIdentityConfiguration = new IdentityConfiguration(false);
             MetadataCacheDuration = new TimeSpan(1, 0, 0);
             Compatibility = new Compatibility();
-            SigningAlgorithm = XmlHelpers.GetDefaultSigningAlgorithmName();
         }
 
         /// <summary>
@@ -53,7 +52,6 @@ namespace Kentor.AuthServices.Configuration
             ModulePath = configSection.ModulePath;
             PublicOrigin = configSection.PublicOrigin;
             Organization = configSection.Organization;
-            SigningAlgorithm = XmlHelpers.GetFullSigningAlgorithmName(configSection.SigningAlgorithm);
             AuthenticateRequestSigningBehavior = configSection.AuthenticateRequestSigningBehavior;
             NameIdPolicy = new Saml2NameIdPolicy(
                 configSection.NameIdPolicyElement.AllowCreate, configSection.NameIdPolicyElement.Format);
@@ -181,8 +179,7 @@ namespace Kentor.AuthServices.Configuration
         /// application root path from the HTTP request when creating links. 
         /// This might not be accurate in reverse proxy or load-balancing
         /// situations. You can override the origin used for link generation
-        /// for the entire application using this property. To override per request,
-        /// implement a <code>GetPublicOrigin</code> Notification function.
+        /// using this property.
         /// </summary>
         public Uri PublicOrigin { get; set; }
 
@@ -356,12 +353,6 @@ namespace Kentor.AuthServices.Configuration
         /// </summary>
         public SigningBehavior AuthenticateRequestSigningBehavior { get; set; }
 
-        /// <summary>
-        /// Signing algorithm for metadata and outbound messages. Can be 
-        /// overriden for each <see cref="IdentityProvider"/>.
-        /// </summary>
-        public string SigningAlgorithm { get; set; }
-        
         /// <summary>
         /// Metadata flag that we want assertions to be signed.
         /// </summary>

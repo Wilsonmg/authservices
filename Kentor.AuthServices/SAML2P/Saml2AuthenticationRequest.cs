@@ -68,9 +68,21 @@ namespace Kentor.AuthServices.Saml2P
             }
 
             AddScoping(x);
+            //AddProtocolExtensions(x);
 
             return x;
         }
+
+        //private static void AddProtocolExtensions(XElement xElement)
+        //{
+        //    XNamespace rt = "https://idporten-ver1.difi.no/idporten-extensions";
+        //    var onBehalfOf = new XElement(rt + "OnBehalfOf", "vig_onbehalf_test");
+
+        //    var extensionsElement = new XElement(Saml2Namespaces.Saml2P + "Extensions");
+        //    extensionsElement.Add(onBehalfOf);
+
+        //    xElement.Add(extensionsElement);
+        //}
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "NameIdPolicy")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "AllowCreate")]
@@ -199,6 +211,11 @@ namespace Kentor.AuthServices.Saml2P
         /// Scoping for request 
         /// </summary> 
         public Saml2Scoping Scoping { get; set; }
+
+        /// <summary> 
+        /// Scoping for request 
+        /// </summary> 
+        //public Saml2Scoping MessageExtensions { get; set; }
 
         /// <summary>
         /// NameId policy.

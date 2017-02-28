@@ -36,20 +36,7 @@ namespace Kentor.AuthServices.WebSso
                 throw new ArgumentNullException(nameof(request));
             }
 
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             var returnUrl = request.QueryString["ReturnUrl"].SingleOrDefault();
-            Uri parsedUri;
-            if (returnUrl != null && !Uri.TryCreate(returnUrl, UriKind.Relative, out parsedUri))
-            {
-                if (!options.Notifications.ValidateAbsoluteReturnUrl(returnUrl))
-                {
-                    throw new InvalidOperationException("Return Url must be a relative Url.");
-                }
-            }
 
             return Run(request, returnUrl, options);
         }
@@ -188,7 +175,7 @@ namespace Kentor.AuthServices.WebSso
             }
             else
             {
-                return new AuthServicesUrls(request, options).ApplicationUrl;
+                return new AuthServicesUrls(request, options.SPOptions).ApplicationUrl;
             }
         }
 
@@ -210,7 +197,6 @@ namespace Kentor.AuthServices.WebSso
             {
                 DestinationUrl = idp.SingleLogoutServiceResponseUrl,
                 SigningCertificate = options.SPOptions.SigningServiceCertificate,
-                SigningAlgorithm = idp.OutboundSigningAlgorithm,
                 InResponseTo = request.Id,
                 Issuer = options.SPOptions.EntityId,
                 RelayState = unbindResult.RelayState
@@ -223,16 +209,12 @@ namespace Kentor.AuthServices.WebSso
 
         private static CommandResult HandleResponse(UnbindResult unbindResult, StoredRequestState storedRequestState, IOptions options, Uri returnUrl)
         {
-            var logoutResponse = Saml2LogoutResponse.FromXml(unbindResult.Data);
-            var notificationHandledTheStatus = options.Notifications.ProcessSingleLogoutResponseStatus(logoutResponse, storedRequestState);
-            if (!notificationHandledTheStatus) { 
-                var status = logoutResponse.Status;
-                if(status != Saml2StatusCode.Success)
-                {
-                    throw new UnsuccessfulSamlOperationException(string.Format(CultureInfo.InvariantCulture,
-                        "Idp returned status \"{0}\", indicating that the single logout failed. The local session has been successfully terminated.",
-                        status));
-                }
+            var status = Saml2LogoutResponse.FromXml(unbindResult.Data).Status;
+            if(status != Saml2StatusCode.Success)
+            {
+                throw new UnsuccessfulSamlOperationException(string.Format(CultureInfo.InvariantCulture,
+                    "Idp returned status \"{0}\", indicating that the single logout failed. The local session has been successfully terminated.",
+                    status));
             }
 
             var commandResult = new CommandResult

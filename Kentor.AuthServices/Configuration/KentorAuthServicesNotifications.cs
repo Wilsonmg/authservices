@@ -22,15 +22,12 @@ namespace Kentor.AuthServices.Configuration
             SignInCommandResultCreated = (cr, r) => { };
             SelectIdentityProvider = (ei, r) => null;
             GetLogoutResponseState = ( httpRequestData ) => httpRequestData.StoredRequestState;
-            GetPublicOrigin = ( httpRequestData ) => null;
-            ProcessSingleLogoutResponseStatus = ( response, state ) => false;
             GetBinding = Saml2Binding.Get;
             MessageUnbound = ur => { };
             AcsCommandResultCreated = (cr, r) => { };
             LogoutCommandResultCreated = cr => { };
             MetadataCreated = (md, urls) => { };
             MetadataCommandResultCreated = cr => { };
-            ValidateAbsoluteReturnUrl = url => false;
         }
 
         /// <summary>
@@ -74,24 +71,6 @@ namespace Kentor.AuthServices.Configuration
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout")]
         public Func<HttpRequestData, StoredRequestState>
             GetLogoutResponseState { get; set; }
-
-        /// <summary>
-        /// Notification called when a command is about to construct a fully-qualified url
-        /// Return a non-null Uri if you need to override this per request. Otherwise
-        /// it will fall back to the normal logic that checks the request Uri 
-        /// and the SPOptions.PublicOrigin setting
-        /// </summary>
-        public Func<HttpRequestData, Uri>
-            GetPublicOrigin { get; set; }
-
-        /// <summary>
-        /// Notification called when single logout status is returned from IDP.
-        /// Return true to indicate that your notification has handled this status. Otherwise
-        /// it will fall back to the normal status processing logic.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Logout" )]
-        public Func<Saml2LogoutResponse, StoredRequestState, bool>
-            ProcessSingleLogoutResponseStatus { get; set; }
 
         /// <summary>
         /// Get a binding that can unbind data from the supplied request. The
@@ -140,13 +119,5 @@ namespace Kentor.AuthServices.Configuration
         /// outgoing response.
         /// </summary>
         public Action<CommandResult> MetadataCommandResultCreated {get;set;}
-
-        /// <summary>
-        /// Notification called by the SignIn and Logout commands to validate a ReturnUrl that is not relative.
-        /// Return true to indicate that you accept the ReturnUrl, false otherwise.
-        /// Default validation do not accept any absolute URL.
-        /// When false is returned, the SignIn and Logout commands will throw an <see cref="InvalidOperationException"/>.
-        /// </summary>
-        public Func<string, bool> ValidateAbsoluteReturnUrl { get; set; }
     }
 }

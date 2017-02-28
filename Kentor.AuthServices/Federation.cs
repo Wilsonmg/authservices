@@ -129,6 +129,13 @@ namespace Kentor.AuthServices
             // Add or update the idps in the new metadata.
             foreach (var idp in identityProviders)
             {
+                IdentityProvider existing;
+                if (options.IdentityProviders.TryGetValue(idp.EntityId, out existing) &&
+                existing.RequestExtensions != null)
+                {
+                    idp.RequestExtensions = existing.RequestExtensions;
+                }
+
                 options.IdentityProviders[idp.EntityId] = idp;
                 registeredIdentityProviders.Remove(idp.EntityId.Id);
             }

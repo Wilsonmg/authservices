@@ -16,22 +16,21 @@ namespace Kentor.AuthServices.WebSso
         /// Resolve the urls for AuthServices from an http request and options.
         /// </summary>
         /// <param name="request">Request to get application root url from.</param>
-        /// <param name="options">Options to get module path and (optional) notification hooks from.</param>
+        /// <param name="spOptions">SP Options to get module path from.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "sp")]
-        public AuthServicesUrls(HttpRequestData request, IOptions options)
+        public AuthServicesUrls(HttpRequestData request, SPOptions spOptions)
         {
             if (request == null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
 
-            if (options == null)
+            if (spOptions == null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(spOptions));
             }
 
-            var publicOrigin = options.Notifications.GetPublicOrigin(request) ?? options.SPOptions.PublicOrigin ?? request.ApplicationUrl;
-            Init(publicOrigin, options.SPOptions.ModulePath);
+            Init(request.ApplicationUrl, spOptions);
         }
 
         /// <summary>
@@ -94,6 +93,12 @@ namespace Kentor.AuthServices.WebSso
             SignInUrl = new Uri(authServicesRoot + CommandFactory.SignInCommandName);
             ApplicationUrl = publicOrigin;
             LogoutUrl = new Uri(authServicesRoot + CommandFactory.LogoutCommandName);
+        }
+
+        void Init(Uri applicationUrl, SPOptions spOptions)
+        {
+            var publicOrigin = spOptions.PublicOrigin ?? applicationUrl;
+            Init(publicOrigin, spOptions.ModulePath);
         }
 
         /// <summary>

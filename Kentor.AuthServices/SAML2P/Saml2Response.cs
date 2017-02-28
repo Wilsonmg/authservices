@@ -213,7 +213,6 @@ namespace Kentor.AuthServices.Saml2P
             Issuer = issuer;
             this.claimsIdentities = claimsIdentities;
             SigningCertificate = issuerCertificate;
-            SigningAlgorithm = XmlHelpers.GetDefaultSigningAlgorithmName();
             DestinationUrl = destinationUrl;
             RelayState = relayState;
             InResponseTo = inResponseTo;
@@ -228,14 +227,6 @@ namespace Kentor.AuthServices.Saml2P
         /// </summary>
         [ExcludeFromCodeCoverage]
         public X509Certificate2 SigningCertificate { get; }
-
-        /// <summary>
-        /// The signing algorithm to use when signing the message during binding, 
-        /// according to the signature processing rules of each binding.
-        /// </summary>
-        /// <value>The signing algorithm.</value>
-        [ExcludeFromCodeCoverage]
-        public string SigningAlgorithm { get; set; }
 
         private XmlElement xmlElement;
 

@@ -4,6 +4,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Xml;
 
 namespace Kentor.AuthServices.WebSso
@@ -64,25 +65,24 @@ namespace Kentor.AuthServices.WebSso
                 };
 
                 xmlDoc.LoadXml(xml);
-
-                xmlDoc.Sign(message.SigningCertificate, true, message.SigningAlgorithm);
+                xmlDoc.Sign(message.SigningCertificate, true);
                 xml = xmlDoc.OuterXml;
             }
 
             var encodedXml = Convert.ToBase64String(Encoding.UTF8.GetBytes(xml));
 
-            var relayStateHtml = string.IsNullOrEmpty(message.RelayState) ? null 
+            var relayStateHtml = string.IsNullOrEmpty(message.RelayState) ? null
                 : string.Format(CultureInfo.InvariantCulture, PostHtmlRelayStateFormatString, message.RelayState);
 
             var cr = new CommandResult()
             {
                 ContentType = "text/html",
                 Content = String.Format(
-                    CultureInfo.InvariantCulture, 
-                    PostHtmlFormatString, 
-                    message.DestinationUrl, 
-                    relayStateHtml, 
-                    message.MessageName, 
+                    CultureInfo.InvariantCulture,
+                    PostHtmlFormatString,
+                    message.DestinationUrl,
+                    relayStateHtml,
+                    message.MessageName,
                     encodedXml)
             };
 

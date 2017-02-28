@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IdentityModel.Metadata;
 using System.Linq;
 using System.Net;
+using System.Xml.Linq;
 
 namespace Kentor.AuthServices.WebSso
 {
@@ -37,19 +38,9 @@ namespace Kentor.AuthServices.WebSso
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var returnUrl = request.QueryString["ReturnUrl"].FirstOrDefault();
-            Uri parsedUri;
-            if (returnUrl != null && !Uri.TryCreate(returnUrl, UriKind.Relative, out parsedUri))
-            {
-                if (!options.Notifications.ValidateAbsoluteReturnUrl(returnUrl))
-                {
-                    throw new InvalidOperationException("Return Url must be a relative Url.");
-                }
-            }
-
             return Run(
                 new EntityId(request.QueryString["idp"].FirstOrDefault()),
-                returnUrl,
+                request.QueryString["ReturnUrl"].FirstOrDefault(),
                 request,
                 options,
                 null);
@@ -80,7 +71,7 @@ namespace Kentor.AuthServices.WebSso
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var urls = new AuthServicesUrls(request, options);
+            var urls = new AuthServicesUrls(request, options.SPOptions);
 
             IdentityProvider idp = options.Notifications.SelectIdentityProvider(idpEntityId, relayData);
             if (idp == null)
@@ -94,6 +85,9 @@ namespace Kentor.AuthServices.WebSso
                         return commandResult;
                     }
                     idp = options.IdentityProviders.Default;
+                    XNamespace idPortenExtensionNs = "https://idporten-ver1.difi.no/idporten-extensions";
+                    var onBehalfOf = new XElement(idPortenExtensionNs + "OnBehalfOf", "vig_onbehalf_test");
+                    idp.RequestExtensions = new[] { onBehalfOf };
                 }
                 else
                 {
