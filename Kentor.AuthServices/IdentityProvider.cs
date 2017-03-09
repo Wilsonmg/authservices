@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Collections.Concurrent;
 using System.Security.Claims;
+using System.Xml.Linq;
 
 namespace Kentor.AuthServices
 {
@@ -151,7 +152,12 @@ namespace Kentor.AuthServices
                 binding = value;
             }
         }
-
+        
+        /// <summary>
+        /// The provider specific request message extensions.
+        /// </summary>
+        public IEnumerable<XNode> RequestExtensions { get; set; }
+        
         private Uri singleSignOnServiceUrl;
 
         /// <summary>
@@ -301,6 +307,7 @@ namespace Kentor.AuthServices
                 AttributeConsumingServiceIndex = spOptions.AttributeConsumingServices.Any() ? 0 : (int?)null,
                 NameIdPolicy = spOptions.NameIdPolicy,
                 RequestedAuthnContext = spOptions.RequestedAuthnContext,
+                ExtensionsContent = RequestExtensions,
                 SigningAlgorithm = this.OutboundSigningAlgorithm
             };
 
